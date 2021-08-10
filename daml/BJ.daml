@@ -1,0 +1,103 @@
+module BJ where 
+
+import Daml.Script
+import DA.List
+
+data Suit = Spades | Hearts | Diamonds | Clubs deriving (Show, Eq)
+
+data Rank = Ace | Pip Int | Jack | Queen | King deriving (Show, Eq)
+
+-- why doesn't it work?
+--- data Card = Card Suit Rank
+data Card = Card with rank: Rank ; suit: Suit deriving (Show, Eq)
+
+data Deck = Deck [Card] deriving (Show, Eq)
+
+dealCard : Deck -> Card
+dealCard (Deck x) = head x
+
+addCard: Deck  -> Card -> Deck
+addCard (Deck x) y =  Deck (x ++[y])
+
+exampleDeck = Deck [ Card Ace Spades, Card (Pip 10) Hearts, Card (Pip 6) Hearts, Card (Pip 7) Clubs, Card King Diamonds, Card Queen Clubs]
+emptyDeck = Deck []
+
+template Dealer with 
+        dealer: Party
+        deck: Deck
+        money: Int
+    where 
+        signatory dealer
+        controller dealer can
+            ProposeGame: ContractId GameProposal
+                with 
+                    player: Party
+                do
+                    create GameProposal
+                        with 
+                            dealer = this
+                            player  = player
+                            playerCards = Deck []
+                            dealerCards = Deck []
+        
+            
+
+
+-- template GameProposal with
+--         dealer: Dealer
+--     where 
+--         signatory dealer.dealer
+--         observer dealer.dealer  -- ???
+
+            
+template GameProposal with
+        dealer: Dealer
+        player: Party
+        dealerCards: Deck
+        playerCards: Deck
+    where 
+        signatory dealer.dealer
+        observer player
+
+        choice Hit: ContractId  GameBeforeDeal
+            controller player
+            do
+              create GameBeforeDeal with dealer = dealer; player = player; dealerCards = dealerCards; playerCards = playerCards
+
+template GameBeforeDeal with 
+        dealer: Dealer
+        player: Party
+        dealerCards: Deck
+        playerCards: Deck
+    where 
+        signatory player, dealer.dealer
+        choice Deal: ContractId GameProposal
+            controller dealer.dealer 
+            do 
+                let newCard = dealCard dealer.deck
+                newProposal <- create GameProposal with 
+                    playerCards = addCard playerCards newCard
+                    dealerCards = dealerCards
+                    dealer  = dealer
+                    player = player 
+                return newProposal
+                
+
+            
+    
+
+
+
+exampleDealer = allocateParty "Dealer1"
+
+
+test1 : Script Deck
+test1 = do 
+    d1 <- allocateParty "Dealer1"
+    p1 <- allocateParty "Player1"
+    dealerCtr <- submit d1 $ createCmd Dealer with dealer = d1 ; deck = exampleDeck; money = 100
+    proposal <- submit d1 $ exerciseCmd dealerCtr ProposeGame with player = p1
+    -- hit <- submit p1 $ exerciseCmd proposal Hit
+    -- deal <- submit d1 $ exerciseCmd hit Deal 
+    -- dealData <- submit p1 $ fetch deal
+    return exampleDeck
