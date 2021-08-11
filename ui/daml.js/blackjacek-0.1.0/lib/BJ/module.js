@@ -15,7 +15,7 @@ var damlLedger = require('@daml/ledger');
 var pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662 = require('@daml.js/d14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662');
 
 
-exports.Deal = {
+exports.NextDeal = {
   decoder: damlTypes.lazyMemo(function () { return jtv.object({}); }),
   encode: function (__typed__) {
   return {
@@ -26,14 +26,15 @@ exports.Deal = {
 
 
 
-exports.GameBeforeDeal = {
-  templateId: '9cb5481665b88dd8f4d291b1c9ca2d8658e671dfba9afa685ad4df723b9883e4:BJ:GameBeforeDeal',
+exports.PlayerAsksForCard = {
+  templateId: 'dd8de2afed586db7facbd37f58673a6f7f64a10c632a77e51ca04e554b4d7f56:BJ:PlayerAsksForCard',
   keyDecoder: damlTypes.lazyMemo(function () { return jtv.constant(undefined); }),
   keyEncode: function () { throw 'EncodeError'; },
-  decoder: damlTypes.lazyMemo(function () { return jtv.object({dealer: exports.Dealer.decoder, player: damlTypes.Party.decoder, dealerCards: exports.Deck.decoder, playerCards: exports.Deck.decoder, }); }),
+  decoder: damlTypes.lazyMemo(function () { return jtv.object({deck: damlTypes.ContractId(exports.DealerDeck).decoder, dealer: damlTypes.Party.decoder, player: damlTypes.Party.decoder, dealerCards: exports.Deck.decoder, playerCards: exports.Deck.decoder, }); }),
   encode: function (__typed__) {
   return {
-    dealer: exports.Dealer.encode(__typed__.dealer),
+    deck: damlTypes.ContractId(exports.DealerDeck).encode(__typed__.deck),
+    dealer: damlTypes.Party.encode(__typed__.dealer),
     player: damlTypes.Party.encode(__typed__.player),
     dealerCards: exports.Deck.encode(__typed__.dealerCards),
     playerCards: exports.Deck.encode(__typed__.playerCards),
@@ -41,25 +42,25 @@ exports.GameBeforeDeal = {
 }
 ,
   Archive: {
-    template: function () { return exports.GameBeforeDeal; },
+    template: function () { return exports.PlayerAsksForCard; },
     choiceName: 'Archive',
     argumentDecoder: damlTypes.lazyMemo(function () { return pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive.decoder; }),
     argumentEncode: function (__typed__) { return pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive.encode(__typed__); },
     resultDecoder: damlTypes.lazyMemo(function () { return damlTypes.Unit.decoder; }),
     resultEncode: function (__typed__) { return damlTypes.Unit.encode(__typed__); },
   },
-  Deal: {
-    template: function () { return exports.GameBeforeDeal; },
-    choiceName: 'Deal',
-    argumentDecoder: damlTypes.lazyMemo(function () { return exports.Deal.decoder; }),
-    argumentEncode: function (__typed__) { return exports.Deal.encode(__typed__); },
+  NextDeal: {
+    template: function () { return exports.PlayerAsksForCard; },
+    choiceName: 'NextDeal',
+    argumentDecoder: damlTypes.lazyMemo(function () { return exports.NextDeal.decoder; }),
+    argumentEncode: function (__typed__) { return exports.NextDeal.encode(__typed__); },
     resultDecoder: damlTypes.lazyMemo(function () { return damlTypes.ContractId(exports.GameProposal).decoder; }),
     resultEncode: function (__typed__) { return damlTypes.ContractId(exports.GameProposal).encode(__typed__); },
   },
 };
 
 
-damlTypes.registerTemplate(exports.GameBeforeDeal);
+damlTypes.registerTemplate(exports.PlayerAsksForCard);
 
 
 
@@ -75,13 +76,14 @@ exports.Hit = {
 
 
 exports.GameProposal = {
-  templateId: '9cb5481665b88dd8f4d291b1c9ca2d8658e671dfba9afa685ad4df723b9883e4:BJ:GameProposal',
+  templateId: 'dd8de2afed586db7facbd37f58673a6f7f64a10c632a77e51ca04e554b4d7f56:BJ:GameProposal',
   keyDecoder: damlTypes.lazyMemo(function () { return jtv.constant(undefined); }),
   keyEncode: function () { throw 'EncodeError'; },
-  decoder: damlTypes.lazyMemo(function () { return jtv.object({dealer: exports.Dealer.decoder, player: damlTypes.Party.decoder, dealerCards: exports.Deck.decoder, playerCards: exports.Deck.decoder, }); }),
+  decoder: damlTypes.lazyMemo(function () { return jtv.object({deck: damlTypes.ContractId(exports.DealerDeck).decoder, dealer: damlTypes.Party.decoder, player: damlTypes.Party.decoder, dealerCards: exports.Deck.decoder, playerCards: exports.Deck.decoder, }); }),
   encode: function (__typed__) {
   return {
-    dealer: exports.Dealer.encode(__typed__.dealer),
+    deck: damlTypes.ContractId(exports.DealerDeck).encode(__typed__.deck),
+    dealer: damlTypes.Party.encode(__typed__.dealer),
     player: damlTypes.Party.encode(__typed__.player),
     dealerCards: exports.Deck.encode(__typed__.dealerCards),
     playerCards: exports.Deck.encode(__typed__.playerCards),
@@ -101,8 +103,8 @@ exports.GameProposal = {
     choiceName: 'Hit',
     argumentDecoder: damlTypes.lazyMemo(function () { return exports.Hit.decoder; }),
     argumentEncode: function (__typed__) { return exports.Hit.encode(__typed__); },
-    resultDecoder: damlTypes.lazyMemo(function () { return damlTypes.ContractId(exports.GameBeforeDeal).decoder; }),
-    resultEncode: function (__typed__) { return damlTypes.ContractId(exports.GameBeforeDeal).encode(__typed__); },
+    resultDecoder: damlTypes.lazyMemo(function () { return damlTypes.ContractId(exports.PlayerAsksForCard).decoder; }),
+    resultEncode: function (__typed__) { return damlTypes.ContractId(exports.PlayerAsksForCard).encode(__typed__); },
   },
 };
 
@@ -111,11 +113,10 @@ damlTypes.registerTemplate(exports.GameProposal);
 
 
 
-exports.ProposeGame = {
-  decoder: damlTypes.lazyMemo(function () { return jtv.object({player: damlTypes.Party.decoder, }); }),
+exports.AcceptGame = {
+  decoder: damlTypes.lazyMemo(function () { return jtv.object({}); }),
   encode: function (__typed__) {
   return {
-    player: damlTypes.Party.encode(__typed__.player),
   };
 }
 ,
@@ -123,39 +124,65 @@ exports.ProposeGame = {
 
 
 
-exports.Dealer = {
-  templateId: '9cb5481665b88dd8f4d291b1c9ca2d8658e671dfba9afa685ad4df723b9883e4:BJ:Dealer',
+exports.PlayerAtTable = {
+  templateId: 'dd8de2afed586db7facbd37f58673a6f7f64a10c632a77e51ca04e554b4d7f56:BJ:PlayerAtTable',
   keyDecoder: damlTypes.lazyMemo(function () { return jtv.constant(undefined); }),
   keyEncode: function () { throw 'EncodeError'; },
-  decoder: damlTypes.lazyMemo(function () { return jtv.object({dealer: damlTypes.Party.decoder, deck: exports.Deck.decoder, money: damlTypes.Int.decoder, }); }),
+  decoder: damlTypes.lazyMemo(function () { return jtv.object({player: damlTypes.Party.decoder, dealer: damlTypes.Party.decoder, }); }),
   encode: function (__typed__) {
   return {
+    player: damlTypes.Party.encode(__typed__.player),
     dealer: damlTypes.Party.encode(__typed__.dealer),
-    deck: exports.Deck.encode(__typed__.deck),
-    money: damlTypes.Int.encode(__typed__.money),
   };
 }
 ,
   Archive: {
-    template: function () { return exports.Dealer; },
+    template: function () { return exports.PlayerAtTable; },
     choiceName: 'Archive',
     argumentDecoder: damlTypes.lazyMemo(function () { return pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive.decoder; }),
     argumentEncode: function (__typed__) { return pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive.encode(__typed__); },
     resultDecoder: damlTypes.lazyMemo(function () { return damlTypes.Unit.decoder; }),
     resultEncode: function (__typed__) { return damlTypes.Unit.encode(__typed__); },
   },
-  ProposeGame: {
-    template: function () { return exports.Dealer; },
-    choiceName: 'ProposeGame',
-    argumentDecoder: damlTypes.lazyMemo(function () { return exports.ProposeGame.decoder; }),
-    argumentEncode: function (__typed__) { return exports.ProposeGame.encode(__typed__); },
+  AcceptGame: {
+    template: function () { return exports.PlayerAtTable; },
+    choiceName: 'AcceptGame',
+    argumentDecoder: damlTypes.lazyMemo(function () { return exports.AcceptGame.decoder; }),
+    argumentEncode: function (__typed__) { return exports.AcceptGame.encode(__typed__); },
     resultDecoder: damlTypes.lazyMemo(function () { return damlTypes.ContractId(exports.GameProposal).decoder; }),
     resultEncode: function (__typed__) { return damlTypes.ContractId(exports.GameProposal).encode(__typed__); },
   },
 };
 
 
-damlTypes.registerTemplate(exports.Dealer);
+damlTypes.registerTemplate(exports.PlayerAtTable);
+
+
+
+exports.DealerDeck = {
+  templateId: 'dd8de2afed586db7facbd37f58673a6f7f64a10c632a77e51ca04e554b4d7f56:BJ:DealerDeck',
+  keyDecoder: damlTypes.lazyMemo(function () { return damlTypes.lazyMemo(function () { return damlTypes.Party.decoder; }); }),
+  keyEncode: function (__typed__) { return damlTypes.Party.encode(__typed__); },
+  decoder: damlTypes.lazyMemo(function () { return jtv.object({dealer: damlTypes.Party.decoder, deck: exports.Deck.decoder, }); }),
+  encode: function (__typed__) {
+  return {
+    dealer: damlTypes.Party.encode(__typed__.dealer),
+    deck: exports.Deck.encode(__typed__.deck),
+  };
+}
+,
+  Archive: {
+    template: function () { return exports.DealerDeck; },
+    choiceName: 'Archive',
+    argumentDecoder: damlTypes.lazyMemo(function () { return pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive.decoder; }),
+    argumentEncode: function (__typed__) { return pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive.encode(__typed__); },
+    resultDecoder: damlTypes.lazyMemo(function () { return damlTypes.Unit.decoder; }),
+    resultEncode: function (__typed__) { return damlTypes.Unit.encode(__typed__); },
+  },
+};
+
+
+damlTypes.registerTemplate(exports.DealerDeck);
 
 
 

@@ -9,33 +9,34 @@ import * as damlLedger from '@daml/ledger';
 
 import * as pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662 from '@daml.js/d14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662';
 
-export declare type Deal = {
+export declare type NextDeal = {
 };
 
-export declare const Deal:
-  damlTypes.Serializable<Deal> & {
+export declare const NextDeal:
+  damlTypes.Serializable<NextDeal> & {
   }
 ;
 
 
-export declare type GameBeforeDeal = {
-  dealer: Dealer;
+export declare type PlayerAsksForCard = {
+  deck: damlTypes.ContractId<DealerDeck>;
+  dealer: damlTypes.Party;
   player: damlTypes.Party;
   dealerCards: Deck;
   playerCards: Deck;
 };
 
-export declare const GameBeforeDeal:
-  damlTypes.Template<GameBeforeDeal, undefined, '9cb5481665b88dd8f4d291b1c9ca2d8658e671dfba9afa685ad4df723b9883e4:BJ:GameBeforeDeal'> & {
-  Archive: damlTypes.Choice<GameBeforeDeal, pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive, {}, undefined>;
-  Deal: damlTypes.Choice<GameBeforeDeal, Deal, damlTypes.ContractId<GameProposal>, undefined>;
+export declare const PlayerAsksForCard:
+  damlTypes.Template<PlayerAsksForCard, undefined, 'dd8de2afed586db7facbd37f58673a6f7f64a10c632a77e51ca04e554b4d7f56:BJ:PlayerAsksForCard'> & {
+  Archive: damlTypes.Choice<PlayerAsksForCard, pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive, {}, undefined>;
+  NextDeal: damlTypes.Choice<PlayerAsksForCard, NextDeal, damlTypes.ContractId<GameProposal>, undefined>;
 };
 
-export declare namespace GameBeforeDeal {
-  export type CreateEvent = damlLedger.CreateEvent<GameBeforeDeal, undefined, typeof GameBeforeDeal.templateId>
-  export type ArchiveEvent = damlLedger.ArchiveEvent<GameBeforeDeal, typeof GameBeforeDeal.templateId>
-  export type Event = damlLedger.Event<GameBeforeDeal, undefined, typeof GameBeforeDeal.templateId>
-  export type QueryResult = damlLedger.QueryResult<GameBeforeDeal, undefined, typeof GameBeforeDeal.templateId>
+export declare namespace PlayerAsksForCard {
+  export type CreateEvent = damlLedger.CreateEvent<PlayerAsksForCard, undefined, typeof PlayerAsksForCard.templateId>
+  export type ArchiveEvent = damlLedger.ArchiveEvent<PlayerAsksForCard, typeof PlayerAsksForCard.templateId>
+  export type Event = damlLedger.Event<PlayerAsksForCard, undefined, typeof PlayerAsksForCard.templateId>
+  export type QueryResult = damlLedger.QueryResult<PlayerAsksForCard, undefined, typeof PlayerAsksForCard.templateId>
 }
 
 
@@ -50,16 +51,17 @@ export declare const Hit:
 
 
 export declare type GameProposal = {
-  dealer: Dealer;
+  deck: damlTypes.ContractId<DealerDeck>;
+  dealer: damlTypes.Party;
   player: damlTypes.Party;
   dealerCards: Deck;
   playerCards: Deck;
 };
 
 export declare const GameProposal:
-  damlTypes.Template<GameProposal, undefined, '9cb5481665b88dd8f4d291b1c9ca2d8658e671dfba9afa685ad4df723b9883e4:BJ:GameProposal'> & {
+  damlTypes.Template<GameProposal, undefined, 'dd8de2afed586db7facbd37f58673a6f7f64a10c632a77e51ca04e554b4d7f56:BJ:GameProposal'> & {
   Archive: damlTypes.Choice<GameProposal, pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive, {}, undefined>;
-  Hit: damlTypes.Choice<GameProposal, Hit, damlTypes.ContractId<GameBeforeDeal>, undefined>;
+  Hit: damlTypes.Choice<GameProposal, Hit, damlTypes.ContractId<PlayerAsksForCard>, undefined>;
 };
 
 export declare namespace GameProposal {
@@ -71,33 +73,51 @@ export declare namespace GameProposal {
 
 
 
-export declare type ProposeGame = {
-  player: damlTypes.Party;
+export declare type AcceptGame = {
 };
 
-export declare const ProposeGame:
-  damlTypes.Serializable<ProposeGame> & {
+export declare const AcceptGame:
+  damlTypes.Serializable<AcceptGame> & {
   }
 ;
 
 
-export declare type Dealer = {
+export declare type PlayerAtTable = {
+  player: damlTypes.Party;
+  dealer: damlTypes.Party;
+};
+
+export declare const PlayerAtTable:
+  damlTypes.Template<PlayerAtTable, undefined, 'dd8de2afed586db7facbd37f58673a6f7f64a10c632a77e51ca04e554b4d7f56:BJ:PlayerAtTable'> & {
+  Archive: damlTypes.Choice<PlayerAtTable, pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive, {}, undefined>;
+  AcceptGame: damlTypes.Choice<PlayerAtTable, AcceptGame, damlTypes.ContractId<GameProposal>, undefined>;
+};
+
+export declare namespace PlayerAtTable {
+  export type CreateEvent = damlLedger.CreateEvent<PlayerAtTable, undefined, typeof PlayerAtTable.templateId>
+  export type ArchiveEvent = damlLedger.ArchiveEvent<PlayerAtTable, typeof PlayerAtTable.templateId>
+  export type Event = damlLedger.Event<PlayerAtTable, undefined, typeof PlayerAtTable.templateId>
+  export type QueryResult = damlLedger.QueryResult<PlayerAtTable, undefined, typeof PlayerAtTable.templateId>
+}
+
+
+
+export declare type DealerDeck = {
   dealer: damlTypes.Party;
   deck: Deck;
-  money: damlTypes.Int;
 };
 
-export declare const Dealer:
-  damlTypes.Template<Dealer, undefined, '9cb5481665b88dd8f4d291b1c9ca2d8658e671dfba9afa685ad4df723b9883e4:BJ:Dealer'> & {
-  Archive: damlTypes.Choice<Dealer, pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive, {}, undefined>;
-  ProposeGame: damlTypes.Choice<Dealer, ProposeGame, damlTypes.ContractId<GameProposal>, undefined>;
+export declare const DealerDeck:
+  damlTypes.Template<DealerDeck, DealerDeck.Key, 'dd8de2afed586db7facbd37f58673a6f7f64a10c632a77e51ca04e554b4d7f56:BJ:DealerDeck'> & {
+  Archive: damlTypes.Choice<DealerDeck, pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive, {}, DealerDeck.Key>;
 };
 
-export declare namespace Dealer {
-  export type CreateEvent = damlLedger.CreateEvent<Dealer, undefined, typeof Dealer.templateId>
-  export type ArchiveEvent = damlLedger.ArchiveEvent<Dealer, typeof Dealer.templateId>
-  export type Event = damlLedger.Event<Dealer, undefined, typeof Dealer.templateId>
-  export type QueryResult = damlLedger.QueryResult<Dealer, undefined, typeof Dealer.templateId>
+export declare namespace DealerDeck {
+  export type Key = damlTypes.Party
+  export type CreateEvent = damlLedger.CreateEvent<DealerDeck, DealerDeck.Key, typeof DealerDeck.templateId>
+  export type ArchiveEvent = damlLedger.ArchiveEvent<DealerDeck, typeof DealerDeck.templateId>
+  export type Event = damlLedger.Event<DealerDeck, DealerDeck.Key, typeof DealerDeck.templateId>
+  export type QueryResult = damlLedger.QueryResult<DealerDeck, DealerDeck.Key, typeof DealerDeck.templateId>
 }
 
 

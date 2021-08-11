@@ -9,4 +9,4 @@ var BJ = require('./BJ');
 exports.BJ = BJ;
 var User = require('./User');
 exports.User = User;
-exports.packageId = '9cb5481665b88dd8f4d291b1c9ca2d8658e671dfba9afa685ad4df723b9883e4';
+exports.packageId = 'dd8de2afed586db7facbd37f58673a6f7f64a10c632a77e51ca04e554b4d7f56';
