@@ -2,10 +2,19 @@ import React, {useEffect} from 'react';
 import Ledger from '@daml/ledger';
 import {useFetchByKey, useLedger, useParty, useStreamQueries} from "@daml/react";
 import {BJ, User} from '@daml.js/blackjacek';
-import {Card, DealerDeck, Deck, GameProposal, PlayerAsksForCard, PlayerAtTable} from "@daml.js/blackjacek/lib/BJ";
+import {
+    Card,
+    DealerDeck,
+    Deck,
+    GameProposal,
+    PlayerAsksForCard,
+    PlayerAtTable,
+    Rank,
+    Suit
+} from "@daml.js/blackjacek/lib/BJ";
 import {useStreamFetchByKey, useStreamFetchByKeys} from "@daml/react/defaultLedgerContext";
 import { FetchResult} from "@daml/react";
-import {ContractId, Party} from "@daml/types";
+import {ContractId, Int, Party} from "@daml/types";
 
 const BJMain: React.FC = () => {
     const [dealerName, setDealerName] = React.useState('');
@@ -16,17 +25,17 @@ const BJMain: React.FC = () => {
     const allPlayersToAccept = useStreamQueries(BJ.PlayerAtTable).contracts;
     const allTables = useStreamQueries(BJ.GameProposal).contracts;
     const toDeal = useStreamQueries(BJ.PlayerAsksForCard).contracts;
-    // const contract = useFetchByKey(BJ.DealerDeck, () => dealerName, [dealerName])
-    // // const contract  = useStreamFetchByKeys(BJ.DealerDeck, () => [dealerName], [dealerName], () => {
-    // // });
+
 
     const initDealerDeck = () => {
-        const card1: Card = {suit: "Clubs", rank: {tag: 'Ace', value: {}}};
-        const card2: Card = {suit: "Clubs", rank: {tag: 'Pip', value: "2"}};
-        const card3: Card = {suit: "Clubs", rank: {tag: 'Pip', value: "6"}};
-        const card4: Card = {suit: "Clubs", rank: {tag: 'Pip', value: "8"}};
-        const deck: Deck = {tag: 'Deck', value: [card1, card2, card3, card4]};
-
+        // const card1: Card = {suit: "Clubs", rank: {tag: 'Ace', value: {}}};
+        // const card2: Card = {suit: "Clubs", rank: {tag: 'Pip', value: "2"}};
+        // const card3: Card = {suit: "Clubs", rank: {tag: 'Pip', value: "6"}};
+        // const card4: Card = {suit: "Clubs", rank: {tag: 'Pip', value: "8"}};
+        // const card5: Card = {suit: "Clubs", rank: {tag: 'Pip', value: "5"}};
+        // const card6: Card = {suit: "Clubs", rank: {tag: 'Pip', value: "9"}};
+        // const deck: Deck = {tag: 'Deck', value: [card1, card2, card3, card4, card5, card6]};
+        const deck = createRandomDeck();
         const dealer: DealerDeck = {
             dealer: party, deck: deck
         };
@@ -49,6 +58,7 @@ const BJMain: React.FC = () => {
     };
 
     const acceptGame = (contractId: ContractId<PlayerAtTable>) => () => {
+        console.log("trying to accept:" + contractId);
         const accepted = ledger.exercise(BJ.PlayerAtTable.AcceptGame, contractId, {});
         accepted.then( ctr => {
            console.log("player accepted");
@@ -134,8 +144,9 @@ const BJTable: React.FC<TableProps> = (props) => {
     };
 
     return <div>
-        <h4>dealer hand</h4><BJHand cards={props.game.dealerCards}/>
+        <h4>dealer hand</h4><BJHand cards={props.game.dealerCards} />
         <h4>player hand</h4><BJHand cards={props.game.playerCards}/>
+        <h4>player value</h4> <div>{props.game.playerCardValues.join("; ")}</div>
         {isPlayer ? <div><button onClick={hit}>Hit</button></div> : <span></span> }
     </div>;
 };
@@ -144,13 +155,14 @@ type DealerTableProps = {
     game: PlayerAsksForCard
     contractId: ContractId<PlayerAsksForCard>
 }
-const BJTableToDeal: React.FC<TableProps> = (props) => {
+const BJTableToDeal: React.FC<DealerTableProps> = (props) => {
     const party = useParty();
 
     const isDealer=  party === props.game.dealer;
     const ledger = useLedger();
 
     const deal = () => {
+        console.log("before nextDeal "+ props.contractId);
         ledger.exercise(BJ.PlayerAsksForCard.NextDeal, props.contractId, {});
     };
 
@@ -176,3 +188,31 @@ function showDeck(deck: Deck) {
 }
 
 export default BJMain;
+
+function createPip(val:number) : Rank {
+    return {tag:'Pip', value:val.toString() };
+}
+
+function createFullSuit(suit: Suit) : Array<Card> {
+    const pips = Array.from(Array(9).keys()).map ( val => { return {rank: createPip(val+2), suit: suit};} );
+    const ace:Card = {rank: {tag: 'Ace', value:{}}, suit:suit};
+    const king:Card = {rank: {tag: 'King', value:{}}, suit:suit};
+    const queen:Card = {rank: {tag: 'Queen', value:{}}, suit:suit};
+    const jack:Card = {rank: {tag: 'Jack', value:{}}, suit:suit};
+    return [...pips, ace, king, queen, jack];
+}
+
+function createRandomDeck() : Deck {
+    const suits:Array<Suit> = ['Spades','Hearts', 'Diamonds','Clubs'];
+    const cards:Array<Card> = suits.map( s=> createFullSuit(s)).flat();
+    shuffleArray(cards);
+    return  {tag: 'Deck', value:cards};
+}
+//source from
+//https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+function shuffleArray<T>(array:Array<T>) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}

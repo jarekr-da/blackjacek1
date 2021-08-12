@@ -11,7 +11,6 @@ template User with
     signatory username
     observer following
 -- MAIN_TEMPLATE_END
-
     key username: Party
     maintainer key
 

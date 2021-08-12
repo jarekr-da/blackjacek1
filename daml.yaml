@@ -3,9 +3,10 @@ name: blackjacek
 version: 0.1.0
 source: daml
 parties:
-- Alice
-- Bob
-- Charlie
+- d
+- q
+- dealer
+- player
 dependencies:
 - daml-prim
 - daml-stdlib
@@ -13,7 +14,7 @@ dependencies:
 sandbox-options:
 - --wall-clock-time
 - --ledgerid=blackjacek-sandbox
-start-navigator: false
+start-navigator: true
 codegen:
   js:
     output-directory: ui/daml.js

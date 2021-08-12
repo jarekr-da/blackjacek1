@@ -16,6 +16,8 @@ data Deck = Deck [Card] deriving (Show, Eq)
 
 
 
+
+
 addCard: Deck  -> Card -> Deck
 addCard (Deck x) y =  Deck (x ++[y])
 
@@ -29,6 +31,27 @@ countDeck : Deck -> Int
 countDeck (Deck x) = length x
 
 
+rankValues : Rank -> [Int]
+rankValues Ace = [1,11]
+rankValues (Pip x) = [x]
+rankValues _ = [10]
+
+cardValues : Card -> [Int]
+cardValues x = rankValues $ rank x 
+
+combine: [Int] -> [Int] -> [Int]
+combine [] y = y
+combine x [] = x
+combine x y =  flatten $ map (\a -> map (\b-> a+ b) y ) x 
+
+flatten: [[a]] -> [a]
+flatten [] = []
+flatten (head::tail) = head ++ flatten tail
+
+deckValues : Deck -> [Int]
+deckValues (Deck []) = [0]
+deckValues (Deck cards) = foldl (\acc card -> combine acc (cardValues card) ) [] cards
+ 
 template DealerDeck with 
         dealer: Party
         deck: Deck
@@ -56,7 +79,7 @@ template PlayerAtTable with
                         deck = fst dealerDeck
                         playerCards = Deck initialPlayerCards
                         dealerCards = Deck initialDealerHand
-                        
+                        playerCardValues = deckValues (Deck initialPlayerCards)
 
 
         
@@ -95,14 +118,69 @@ template GameProposal with
         player: Party
         dealerCards: Deck
         playerCards: Deck
+        playerCardValues: [Int]
     where 
         signatory dealer, player
 
         choice Hit: ContractId  PlayerAsksForCard
             controller player
             do
-              create PlayerAsksForCard with 
-                dealer = dealer; deck = deck; player = player; dealerCards = dealerCards; playerCards = playerCards
+                let values = deckValues playerCards
+                assertMsg "You busted" (head values  <= 21)
+                create PlayerAsksForCard with 
+                    dealer = dealer; deck = deck; player = player; dealerCards = dealerCards; playerCards = playerCards
+        choice Stand: ContractId  PlayerStands
+            controller player
+            do
+                create PlayerStands with 
+                    dealer = dealer; deck = deck; player = player; dealerCards = dealerCards; playerCards = playerCards            
+
+template PlayerStands with 
+        deck: ContractId DealerDeck
+        dealer: Party
+        player: Party
+        dealerCards: Deck
+        playerCards: Deck
+    where 
+        signatory player, dealer
+        choice DealSelf: ContractId GameEnd
+            controller dealer 
+            do 
+                dealerShoe <- fetch deck
+                let playerValue = deckValues playerCards
+                if (head playerValue > 21) 
+                    then
+                        do  
+                            end <- create GameEnd with 
+                                deck =  deck
+                                playerCards = playerCards
+                                dealerCards = dealerCards
+                                dealer  = dealer
+                                player = player 
+                                result = -10
+                            return end
+                    else 
+                        do 
+                            end <- create GameEnd with 
+                                deck =  deck
+                                playerCards = playerCards
+                                dealerCards = dealerCards
+                                dealer  = dealer
+                                player = player 
+                                result = -10
+                            return end
+
+
+template GameEnd with 
+        deck: ContractId DealerDeck
+        dealer: Party
+        player: Party
+        dealerCards: Deck
+        playerCards: Deck
+        result: Int
+    where
+        signatory dealer, player
+        
 
 template PlayerAsksForCard with 
         deck: ContractId DealerDeck
@@ -117,20 +195,16 @@ template PlayerAsksForCard with
             do 
                 dealerShoe <- fetch deck
                 let cardsOnTable = (countDeck dealerCards) + (countDeck playerCards)
-                let newCard = takeCard  dealerShoe.deck cardsOnTable            
+                let newCard = takeCard  dealerShoe.deck cardsOnTable      
+                let newPlayerDeck =  addCard playerCards newCard
                 newProposal <- create GameProposal with 
                     deck =  deck
-                    playerCards = addCard playerCards newCard
+                    playerCards = newPlayerDeck
                     dealerCards = dealerCards
                     dealer  = dealer
                     player = player 
+                    playerCardValues = deckValues newPlayerDeck
                 return newProposal
-                
-
-            
-    
-
-
 
 exampleDealer = allocateParty "Dealer1"
 
@@ -149,3 +223,10 @@ test1 = do
     deal <- submit d1 $ exerciseCmd hit NextDeal
     -- dealData <- submit p1 $ fetch deal
     return exampleDeck
+
+singleAce: Deck
+singleAce = Deck [ Card with suit = Clubs; rank = Ace]
+
+
+test2: [Int]
+test2 = deckValues singleAce    

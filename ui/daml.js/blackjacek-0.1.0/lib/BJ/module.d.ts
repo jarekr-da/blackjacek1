@@ -27,7 +27,7 @@ export declare type PlayerAsksForCard = {
 };
 
 export declare const PlayerAsksForCard:
-  damlTypes.Template<PlayerAsksForCard, undefined, 'dd8de2afed586db7facbd37f58673a6f7f64a10c632a77e51ca04e554b4d7f56:BJ:PlayerAsksForCard'> & {
+  damlTypes.Template<PlayerAsksForCard, undefined, '3c98fe573dfbb38206363d5b8b369dab3ba53bd5db345646b3d46df1fb0f9280:BJ:PlayerAsksForCard'> & {
   Archive: damlTypes.Choice<PlayerAsksForCard, pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive, {}, undefined>;
   NextDeal: damlTypes.Choice<PlayerAsksForCard, NextDeal, damlTypes.ContractId<GameProposal>, undefined>;
 };
@@ -56,10 +56,11 @@ export declare type GameProposal = {
   player: damlTypes.Party;
   dealerCards: Deck;
   playerCards: Deck;
+  playerCardValues: damlTypes.Int[];
 };
 
 export declare const GameProposal:
-  damlTypes.Template<GameProposal, undefined, 'dd8de2afed586db7facbd37f58673a6f7f64a10c632a77e51ca04e554b4d7f56:BJ:GameProposal'> & {
+  damlTypes.Template<GameProposal, undefined, '3c98fe573dfbb38206363d5b8b369dab3ba53bd5db345646b3d46df1fb0f9280:BJ:GameProposal'> & {
   Archive: damlTypes.Choice<GameProposal, pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive, {}, undefined>;
   Hit: damlTypes.Choice<GameProposal, Hit, damlTypes.ContractId<PlayerAsksForCard>, undefined>;
 };
@@ -88,7 +89,7 @@ export declare type PlayerAtTable = {
 };
 
 export declare const PlayerAtTable:
-  damlTypes.Template<PlayerAtTable, undefined, 'dd8de2afed586db7facbd37f58673a6f7f64a10c632a77e51ca04e554b4d7f56:BJ:PlayerAtTable'> & {
+  damlTypes.Template<PlayerAtTable, undefined, '3c98fe573dfbb38206363d5b8b369dab3ba53bd5db345646b3d46df1fb0f9280:BJ:PlayerAtTable'> & {
   Archive: damlTypes.Choice<PlayerAtTable, pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive, {}, undefined>;
   AcceptGame: damlTypes.Choice<PlayerAtTable, AcceptGame, damlTypes.ContractId<GameProposal>, undefined>;
 };
@@ -108,7 +109,7 @@ export declare type DealerDeck = {
 };
 
 export declare const DealerDeck:
-  damlTypes.Template<DealerDeck, DealerDeck.Key, 'dd8de2afed586db7facbd37f58673a6f7f64a10c632a77e51ca04e554b4d7f56:BJ:DealerDeck'> & {
+  damlTypes.Template<DealerDeck, DealerDeck.Key, '3c98fe573dfbb38206363d5b8b369dab3ba53bd5db345646b3d46df1fb0f9280:BJ:DealerDeck'> & {
   Archive: damlTypes.Choice<DealerDeck, pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive, {}, DealerDeck.Key>;
 };
 

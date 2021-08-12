@@ -42,7 +42,6 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
         </Menu.Menu>
       </Menu>
 
-      {/*<MainView/>*/}
       <BJMain/>
     </>
   );
