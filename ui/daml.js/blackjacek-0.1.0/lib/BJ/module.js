@@ -27,7 +27,7 @@ exports.NextDeal = {
 
 
 exports.PlayerAsksForCard = {
-  templateId: '3c98fe573dfbb38206363d5b8b369dab3ba53bd5db345646b3d46df1fb0f9280:BJ:PlayerAsksForCard',
+  templateId: 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:PlayerAsksForCard',
   keyDecoder: damlTypes.lazyMemo(function () { return jtv.constant(undefined); }),
   keyEncode: function () { throw 'EncodeError'; },
   decoder: damlTypes.lazyMemo(function () { return jtv.object({deck: damlTypes.ContractId(exports.DealerDeck).decoder, dealer: damlTypes.Party.decoder, player: damlTypes.Party.decoder, dealerCards: exports.Deck.decoder, playerCards: exports.Deck.decoder, }); }),
@@ -64,6 +64,98 @@ damlTypes.registerTemplate(exports.PlayerAsksForCard);
 
 
 
+exports.GameEnd = {
+  templateId: 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:GameEnd',
+  keyDecoder: damlTypes.lazyMemo(function () { return jtv.constant(undefined); }),
+  keyEncode: function () { throw 'EncodeError'; },
+  decoder: damlTypes.lazyMemo(function () { return jtv.object({deck: damlTypes.ContractId(exports.DealerDeck).decoder, dealer: damlTypes.Party.decoder, player: damlTypes.Party.decoder, dealerCards: exports.Deck.decoder, playerCards: exports.Deck.decoder, shoeOriginal: exports.Deck.decoder, result: damlTypes.Int.decoder, }); }),
+  encode: function (__typed__) {
+  return {
+    deck: damlTypes.ContractId(exports.DealerDeck).encode(__typed__.deck),
+    dealer: damlTypes.Party.encode(__typed__.dealer),
+    player: damlTypes.Party.encode(__typed__.player),
+    dealerCards: exports.Deck.encode(__typed__.dealerCards),
+    playerCards: exports.Deck.encode(__typed__.playerCards),
+    shoeOriginal: exports.Deck.encode(__typed__.shoeOriginal),
+    result: damlTypes.Int.encode(__typed__.result),
+  };
+}
+,
+  Archive: {
+    template: function () { return exports.GameEnd; },
+    choiceName: 'Archive',
+    argumentDecoder: damlTypes.lazyMemo(function () { return pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive.decoder; }),
+    argumentEncode: function (__typed__) { return pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive.encode(__typed__); },
+    resultDecoder: damlTypes.lazyMemo(function () { return damlTypes.Unit.decoder; }),
+    resultEncode: function (__typed__) { return damlTypes.Unit.encode(__typed__); },
+  },
+};
+
+
+damlTypes.registerTemplate(exports.GameEnd);
+
+
+
+exports.DealSelf = {
+  decoder: damlTypes.lazyMemo(function () { return jtv.object({}); }),
+  encode: function (__typed__) {
+  return {
+  };
+}
+,
+};
+
+
+
+exports.PlayerStands = {
+  templateId: 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:PlayerStands',
+  keyDecoder: damlTypes.lazyMemo(function () { return jtv.constant(undefined); }),
+  keyEncode: function () { throw 'EncodeError'; },
+  decoder: damlTypes.lazyMemo(function () { return jtv.object({deck: damlTypes.ContractId(exports.DealerDeck).decoder, dealer: damlTypes.Party.decoder, player: damlTypes.Party.decoder, dealerCards: exports.Deck.decoder, playerCards: exports.Deck.decoder, }); }),
+  encode: function (__typed__) {
+  return {
+    deck: damlTypes.ContractId(exports.DealerDeck).encode(__typed__.deck),
+    dealer: damlTypes.Party.encode(__typed__.dealer),
+    player: damlTypes.Party.encode(__typed__.player),
+    dealerCards: exports.Deck.encode(__typed__.dealerCards),
+    playerCards: exports.Deck.encode(__typed__.playerCards),
+  };
+}
+,
+  DealSelf: {
+    template: function () { return exports.PlayerStands; },
+    choiceName: 'DealSelf',
+    argumentDecoder: damlTypes.lazyMemo(function () { return exports.DealSelf.decoder; }),
+    argumentEncode: function (__typed__) { return exports.DealSelf.encode(__typed__); },
+    resultDecoder: damlTypes.lazyMemo(function () { return damlTypes.ContractId(exports.GameEnd).decoder; }),
+    resultEncode: function (__typed__) { return damlTypes.ContractId(exports.GameEnd).encode(__typed__); },
+  },
+  Archive: {
+    template: function () { return exports.PlayerStands; },
+    choiceName: 'Archive',
+    argumentDecoder: damlTypes.lazyMemo(function () { return pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive.decoder; }),
+    argumentEncode: function (__typed__) { return pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive.encode(__typed__); },
+    resultDecoder: damlTypes.lazyMemo(function () { return damlTypes.Unit.decoder; }),
+    resultEncode: function (__typed__) { return damlTypes.Unit.encode(__typed__); },
+  },
+};
+
+
+damlTypes.registerTemplate(exports.PlayerStands);
+
+
+
+exports.Stand = {
+  decoder: damlTypes.lazyMemo(function () { return jtv.object({}); }),
+  encode: function (__typed__) {
+  return {
+  };
+}
+,
+};
+
+
+
 exports.Hit = {
   decoder: damlTypes.lazyMemo(function () { return jtv.object({}); }),
   encode: function (__typed__) {
@@ -76,7 +168,7 @@ exports.Hit = {
 
 
 exports.GameProposal = {
-  templateId: '3c98fe573dfbb38206363d5b8b369dab3ba53bd5db345646b3d46df1fb0f9280:BJ:GameProposal',
+  templateId: 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:GameProposal',
   keyDecoder: damlTypes.lazyMemo(function () { return jtv.constant(undefined); }),
   keyEncode: function () { throw 'EncodeError'; },
   decoder: damlTypes.lazyMemo(function () { return jtv.object({deck: damlTypes.ContractId(exports.DealerDeck).decoder, dealer: damlTypes.Party.decoder, player: damlTypes.Party.decoder, dealerCards: exports.Deck.decoder, playerCards: exports.Deck.decoder, playerCardValues: damlTypes.List(damlTypes.Int).decoder, }); }),
@@ -107,6 +199,14 @@ exports.GameProposal = {
     resultDecoder: damlTypes.lazyMemo(function () { return damlTypes.ContractId(exports.PlayerAsksForCard).decoder; }),
     resultEncode: function (__typed__) { return damlTypes.ContractId(exports.PlayerAsksForCard).encode(__typed__); },
   },
+  Stand: {
+    template: function () { return exports.GameProposal; },
+    choiceName: 'Stand',
+    argumentDecoder: damlTypes.lazyMemo(function () { return exports.Stand.decoder; }),
+    argumentEncode: function (__typed__) { return exports.Stand.encode(__typed__); },
+    resultDecoder: damlTypes.lazyMemo(function () { return damlTypes.ContractId(exports.PlayerStands).decoder; }),
+    resultEncode: function (__typed__) { return damlTypes.ContractId(exports.PlayerStands).encode(__typed__); },
+  },
 };
 
 
@@ -126,7 +226,7 @@ exports.AcceptGame = {
 
 
 exports.PlayerAtTable = {
-  templateId: '3c98fe573dfbb38206363d5b8b369dab3ba53bd5db345646b3d46df1fb0f9280:BJ:PlayerAtTable',
+  templateId: 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:PlayerAtTable',
   keyDecoder: damlTypes.lazyMemo(function () { return jtv.constant(undefined); }),
   keyEncode: function () { throw 'EncodeError'; },
   decoder: damlTypes.lazyMemo(function () { return jtv.object({player: damlTypes.Party.decoder, dealer: damlTypes.Party.decoder, }); }),
@@ -161,9 +261,9 @@ damlTypes.registerTemplate(exports.PlayerAtTable);
 
 
 exports.DealerDeck = {
-  templateId: '3c98fe573dfbb38206363d5b8b369dab3ba53bd5db345646b3d46df1fb0f9280:BJ:DealerDeck',
-  keyDecoder: damlTypes.lazyMemo(function () { return damlTypes.lazyMemo(function () { return damlTypes.Party.decoder; }); }),
-  keyEncode: function (__typed__) { return damlTypes.Party.encode(__typed__); },
+  templateId: 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:DealerDeck',
+  keyDecoder: damlTypes.lazyMemo(function () { return jtv.constant(undefined); }),
+  keyEncode: function () { throw 'EncodeError'; },
   decoder: damlTypes.lazyMemo(function () { return jtv.object({dealer: damlTypes.Party.decoder, deck: exports.Deck.decoder, }); }),
   encode: function (__typed__) {
   return {
@@ -184,6 +284,52 @@ exports.DealerDeck = {
 
 
 damlTypes.registerTemplate(exports.DealerDeck);
+
+
+
+exports.ConsumeDeck = {
+  decoder: damlTypes.lazyMemo(function () { return jtv.object({}); }),
+  encode: function (__typed__) {
+  return {
+  };
+}
+,
+};
+
+
+
+exports.InitialDeck = {
+  templateId: 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:InitialDeck',
+  keyDecoder: damlTypes.lazyMemo(function () { return damlTypes.lazyMemo(function () { return damlTypes.Party.decoder; }); }),
+  keyEncode: function (__typed__) { return damlTypes.Party.encode(__typed__); },
+  decoder: damlTypes.lazyMemo(function () { return jtv.object({dealer: damlTypes.Party.decoder, deck: exports.Deck.decoder, }); }),
+  encode: function (__typed__) {
+  return {
+    dealer: damlTypes.Party.encode(__typed__.dealer),
+    deck: exports.Deck.encode(__typed__.deck),
+  };
+}
+,
+  Archive: {
+    template: function () { return exports.InitialDeck; },
+    choiceName: 'Archive',
+    argumentDecoder: damlTypes.lazyMemo(function () { return pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive.decoder; }),
+    argumentEncode: function (__typed__) { return pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive.encode(__typed__); },
+    resultDecoder: damlTypes.lazyMemo(function () { return damlTypes.Unit.decoder; }),
+    resultEncode: function (__typed__) { return damlTypes.Unit.encode(__typed__); },
+  },
+  ConsumeDeck: {
+    template: function () { return exports.InitialDeck; },
+    choiceName: 'ConsumeDeck',
+    argumentDecoder: damlTypes.lazyMemo(function () { return exports.ConsumeDeck.decoder; }),
+    argumentEncode: function (__typed__) { return exports.ConsumeDeck.encode(__typed__); },
+    resultDecoder: damlTypes.lazyMemo(function () { return damlTypes.ContractId(exports.DealerDeck).decoder; }),
+    resultEncode: function (__typed__) { return damlTypes.ContractId(exports.DealerDeck).encode(__typed__); },
+  },
+};
+
+
+damlTypes.registerTemplate(exports.InitialDeck);
 
 
 

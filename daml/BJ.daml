@@ -2,6 +2,7 @@ module BJ where
 
 import Daml.Script
 import DA.List
+import  DA.Foldable (maximum)
 -- import DA.Optional
 
 data Suit = Spades | Hearts | Diamonds | Clubs deriving (Show, Eq)
@@ -27,6 +28,14 @@ emptyDeck = Deck []
 takeCard : Deck -> Int -> Card
 takeCard (Deck deck) number = deck !! number
 
+remainingDeck : Deck -> Int -> Deck
+remainingDeck  (Deck cards) n = Deck $ drop n cards
+
+takeTopCardFromDeck : Deck -> (Deck, Card)
+takeTopCardFromDeck (Deck cards) = (Deck $ tail cards, takeCard (Deck cards) 0)
+
+
+ 
 countDeck : Deck -> Int
 countDeck (Deck x) = length x
 
@@ -51,14 +60,42 @@ flatten (head::tail) = head ++ flatten tail
 deckValues : Deck -> [Int]
 deckValues (Deck []) = [0]
 deckValues (Deck cards) = foldl (\acc card -> combine acc (cardValues card) ) [] cards
- 
-template DealerDeck with 
+
+dealerSelfDeal : Deck -> Deck -> Deck 
+dealerSelfDeal dealerCards  shoe =  
+        let 
+            value = deckValues dealerCards
+            maxVal = maximum value
+            cardDealt = takeTopCardFromDeck shoe
+            newShoe = fst cardDealt
+            newCards = addCard dealerCards (snd cardDealt)
+        in if maxVal < 17 then dealerSelfDeal newCards newShoe   else dealerCards
+
+bestValue : [Int] -> Int
+bestValue values = let 
+                    valid  = filter (\x -> x <= 21) values
+                    nonEmpty = 0 :: valid
+                    reversed = reverse nonEmpty
+                    in 
+                        head reversed 
+
+template InitialDeck with 
         dealer: Party
         deck: Deck
     where
         signatory dealer
         key dealer: Party
         maintainer key
+        controller dealer can
+            ConsumeDeck: ContractId DealerDeck
+                do create DealerDeck with dealer = dealer ; deck = deck
+
+
+template DealerDeck with 
+        dealer: Party
+        deck: Deck
+    where
+        signatory dealer
         
 
 template PlayerAtTable with
@@ -70,46 +107,19 @@ template PlayerAtTable with
         controller dealer can 
             AcceptGame: ContractId GameProposal
                 do
-                    dealerDeck <- fetchByKey @DealerDeck dealer
-                    let initialPlayerCards = (takeCard ((snd dealerDeck).deck) 0)  :: (takeCard ((snd dealerDeck).deck) 1) ::[]
-                    let initialDealerHand = (takeCard ((snd dealerDeck).deck) 2) :: [];
+                    initialDeck <- fetchByKey @InitialDeck dealer
+                    let initialPlayerCards = (takeCard ((snd initialDeck).deck) 0)  :: (takeCard ((snd initialDeck).deck) 1) ::[]
+                    let initialDealerHand = (takeCard ((snd initialDeck).deck) 2) :: [];
+                    dealerDeck <- exercise (fst initialDeck) ConsumeDeck
+
+                    -- archive (fst dealerDeck) (can archived be read later?)
                     create GameProposal with 
                         dealer = dealer
                         player = player
-                        deck = fst dealerDeck
+                        deck = dealerDeck
                         playerCards = Deck initialPlayerCards
                         dealerCards = Deck initialDealerHand
                         playerCardValues = deckValues (Deck initialPlayerCards)
-
-
-        
--- template Deal with 
---         dealer: Party
---         player: Party
---         deck: ContractId DealerDeck
---     where 
---         signatory dealer, player
---         controller dealer can
---             ProposeGame: ContractId GameProposal
---                 with 
---                     player: Party
---                 do
---                     create GameProposal
---                         with 
---                             deck = deck
---                             dealer = dealer
---                             player  = player
---                             playerCards = Deck []
---                             dealerCards = Deck []
-        
-            
-
-
--- template GameProposal with
---         dealer: Dealer
---     where 
---         signatory dealer.dealer
---         observer dealer.dealer  -- ???
 
             
 template GameProposal with
@@ -158,16 +168,26 @@ template PlayerStands with
                                 dealer  = dealer
                                 player = player 
                                 result = -10
+                                shoeOriginal = dealerShoe.deck
                             return end
                     else 
                         do 
+                            let cardsOnTable = countDeck playerCards + countDeck dealerCards
+                            let remainingShoe = remainingDeck dealerShoe.deck cardsOnTable
+                            let dealerDealt = dealerSelfDeal dealerCards remainingShoe
+                            let playerBest = bestValue playerValue
+                            let dealerBest = bestValue $ deckValues dealerDealt
+                            let res = if (dealerBest > playerBest) then -10 else 
+                                    (if (dealerBest == playerBest) then 0 else 10)
+                            
                             end <- create GameEnd with 
                                 deck =  deck
                                 playerCards = playerCards
-                                dealerCards = dealerCards
+                                dealerCards = dealerDealt
                                 dealer  = dealer
                                 player = player 
-                                result = -10
+                                result = res
+                                shoeOriginal = dealerShoe.deck
                             return end
 
 
@@ -177,6 +197,7 @@ template GameEnd with
         player: Party
         dealerCards: Deck
         playerCards: Deck
+        shoeOriginal : Deck
         result: Int
     where
         signatory dealer, player
@@ -213,9 +234,8 @@ test1 : Script Deck
 test1 = do 
     d1 <- allocateParty "Dealer1"
     p1 <- allocateParty "Player1"
-    shoe <- submit d1 $ createCmd DealerDeck with dealer = d1 ; deck = exampleDeck
-    dealerDeckOption <-  queryContractKey @DealerDeck d1 d1
-    
+    shoe <- submit d1 $ createCmd InitialDeck with dealer = d1 ; deck = exampleDeck
+    dealerDeckOption <-  queryContractKey @InitialDeck d1 d1
 
     table <- submit p1 $ createCmd PlayerAtTable with dealer = d1 ; player = p1
     proposal <- submit d1 $ exerciseCmd table AcceptGame

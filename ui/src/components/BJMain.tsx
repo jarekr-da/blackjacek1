@@ -5,44 +5,42 @@ import {BJ, User} from '@daml.js/blackjacek';
 import {
     Card,
     DealerDeck,
-    Deck,
+    Deck, GameEnd,
     GameProposal,
     PlayerAsksForCard,
-    PlayerAtTable,
+    PlayerAtTable, PlayerStands,
     Rank,
     Suit
 } from "@daml.js/blackjacek/lib/BJ";
-import {useStreamFetchByKey, useStreamFetchByKeys} from "@daml/react/defaultLedgerContext";
+import {useStreamFetchByKeys} from "@daml/react/defaultLedgerContext";
 import { FetchResult} from "@daml/react";
 import {ContractId, Int, Party} from "@daml/types";
 
 const BJMain: React.FC = () => {
     const [dealerName, setDealerName] = React.useState('');
-    const [table, setTable] = React.useState<any>();
+
+    const [dealer, setDealer]  = React.useState(false);
+    const [player, setPlayer]  = React.useState(false);
     const party = useParty();
     const ledger = useLedger();
-    const allDealerDecks = useStreamQueries(BJ.DealerDeck).contracts;
+    const allDealerDecks = useStreamQueries(BJ.InitialDeck).contracts;
     const allPlayersToAccept = useStreamQueries(BJ.PlayerAtTable).contracts;
     const allTables = useStreamQueries(BJ.GameProposal).contracts;
     const toDeal = useStreamQueries(BJ.PlayerAsksForCard).contracts;
-
+    const toFinish = useStreamQueries(BJ.PlayerStands).contracts
+    const finished = useStreamQueries(BJ.GameEnd).contracts
+    const isPlaying = allDealerDecks.length + allPlayersToAccept.length + allTables.length + toDeal.length + toFinish.length > 0;
 
     const initDealerDeck = () => {
-        // const card1: Card = {suit: "Clubs", rank: {tag: 'Ace', value: {}}};
-        // const card2: Card = {suit: "Clubs", rank: {tag: 'Pip', value: "2"}};
-        // const card3: Card = {suit: "Clubs", rank: {tag: 'Pip', value: "6"}};
-        // const card4: Card = {suit: "Clubs", rank: {tag: 'Pip', value: "8"}};
-        // const card5: Card = {suit: "Clubs", rank: {tag: 'Pip', value: "5"}};
-        // const card6: Card = {suit: "Clubs", rank: {tag: 'Pip', value: "9"}};
-        // const deck: Deck = {tag: 'Deck', value: [card1, card2, card3, card4, card5, card6]};
         const deck = createRandomDeck();
         const dealer: DealerDeck = {
             dealer: party, deck: deck
         };
-        const newDealerContract = ledger.create(BJ.DealerDeck, dealer);
+        const newDealerContract = ledger.create(BJ.InitialDeck, dealer);
         newDealerContract.then(ctr => {
                 console.log("dealer created");
                 console.log(ctr);
+                setDealer(true);
             }
         );
     };
@@ -66,29 +64,34 @@ const BJMain: React.FC = () => {
         });
     };
 
-    // const proposeGame = () => {
-    //     ledger.exercise(BJ..ProposeGame, firstDeal.contractId, {player:player}).then (gameProposal => {
-    //         console.log("proposal created");
-    //     });
-    // };
 
-    return <div>
+
+    return <div className={"blackjack"}>
         <h2>BlackJack</h2>
+        {!isPlaying ?
+            <div className={"choice"}>
+                <div>
+
+                    <h3>Choose side</h3>
+                    <button onClick={initDealerDeck}>play as dealer</button>
+
+
+                </div>
+                <div>
+                    <h3>play with dealer</h3>
+                    <input type={"text"} value={dealerName} onChange={e => setDealerName(e.currentTarget.value)}/>
+                    <button onClick={findGame}>join table</button>
+                </div>
+            </div> : <span></span>
+        }
         <div>
-
-            <h3>my games</h3>
-            <button onClick={initDealerDeck}>init dealer</button>
-
+            <h3>my tables</h3>
             <ul> {
-                allDealerDecks.map(d => <li key={d.contractId}>my decks: {d.payload.dealer}</li>)
+                allDealerDecks.map(d => <li key={d.contractId}>name: {d.payload.dealer} cards:{d.payload.deck.value.length}</li>)
             }
             </ul>
         </div>
-        <div>
-            <h3>join game</h3>
-            <input type={"text"} value={dealerName} onChange={e => setDealerName(e.currentTarget.value)}/>
-            <button onClick={findGame}>join</button>
-        </div>
+
         <div>
             <h3>players to accept</h3>
             <ul> {
@@ -123,8 +126,28 @@ const BJMain: React.FC = () => {
                     />)
                 }
             </ul>
-        </div>
 
+            <ul>
+                {
+                    toFinish.map( table => <BJTableToFinish
+                        key = {table.contractId}
+                        game = {table.payload}
+                        contractId={table.contractId}
+
+                    />)
+                }
+            </ul>
+        </div>
+        <div>
+            <h3>finished</h3>
+            <ul>
+            {
+                finished.map ( game =>
+                    <BJTableFinished key={game.contractId} game={game.payload} contractId={game.contractId}/>
+                )
+            }
+            </ul>
+        </div>
     </div>;
 }
 
@@ -142,12 +165,15 @@ const BJTable: React.FC<TableProps> = (props) => {
     const hit = () => {
         ledger.exercise(BJ.GameProposal.Hit, props.contractId, {});
     };
-
+    const stand = () => {
+        ledger.exercise(BJ.GameProposal.Stand, props.contractId, {});
+    };
     return <div>
         <h4>dealer hand</h4><BJHand cards={props.game.dealerCards} />
         <h4>player hand</h4><BJHand cards={props.game.playerCards}/>
         <h4>player value</h4> <div>{props.game.playerCardValues.join("; ")}</div>
         {isPlayer ? <div><button onClick={hit}>Hit</button></div> : <span></span> }
+        {isPlayer ? <div><button onClick={stand}>Stand</button></div> : <span></span> }
     </div>;
 };
 
@@ -172,15 +198,78 @@ const BJTableToDeal: React.FC<DealerTableProps> = (props) => {
         {isDealer ? <div><button onClick={deal}>Deal</button></div> : <span></span> }
     </div>;
 };
+
+type FinishTableProps = {
+    game: PlayerStands
+    contractId: ContractId<PlayerStands>
+}
+const BJTableToFinish: React.FC<FinishTableProps> = (props) => {
+    const party = useParty();
+
+    const isDealer=  party === props.game.dealer;
+    const ledger = useLedger();
+
+    const dealSelf = () => {
+        console.log("before nextDeal "+ props.contractId);
+        ledger.exercise(BJ.PlayerStands.DealSelf, props.contractId, {});
+    };
+
+    return <div>
+        <h4>finish</h4>
+        <h4>dealer hand</h4><BJHand cards={props.game.dealerCards}/>
+        <h4>player hand</h4><BJHand cards={props.game.playerCards}/>
+        {isDealer ? <div><button onClick={dealSelf}>Finish</button></div> : <span></span> }
+    </div>;
+};
+
+type FinishedTableProps = {
+    game: GameEnd
+    contractId: ContractId<GameEnd>
+}
+const BJTableFinished: React.FC<FinishedTableProps> = (props) => {
+    const party = useParty();
+
+    return <li>
+        <h4>finished {props.game.result}</h4>
+        <h4>dealer hand</h4><BJHand cards={props.game.dealerCards}/>
+        <h4>player hand</h4><BJHand cards={props.game.playerCards}/>
+        <h4>shoe</h4><BJHand cards={props.game.shoeOriginal}/>
+    </li>;
+};
 type HandProps = {
     cards: Deck
 }
 const BJHand: React.FC<HandProps> = (props) => {
-    return <div>cards {JSON.stringify(props.cards)}</div>;
+    return <div>
+        {props.cards.value.map (c => <BJCard rank={c.rank} suit={c.suit}/>) }
+    </div>;
 };
 
+const BJCard: React.FC<Card> = (card) => {
+    return <figure className={"card"}> {showCard(card)}</figure>;
+};
+
+function showSuit(suit:Suit) : string{
+    if (suit === Suit.Diamonds) {
+        return "\u2666";
+    }
+    if (suit === Suit.Spades) {
+        return "\u2660";
+    }
+    if (suit === Suit.Hearts) {
+        return "\u2665";
+    }
+    if (suit === Suit.Clubs) {
+        return "\u2663";
+    }
+    return "";
+}
+
 function showCard(card: Card) {
-    return card.rank + card.suit;
+    if (card.rank.tag === 'Pip') {
+        return card.rank.value + showSuit(card.suit);
+    }
+    return card.rank.tag.substr(0, 1)  + showSuit(card.suit);
 }
 
 function showDeck(deck: Deck) {

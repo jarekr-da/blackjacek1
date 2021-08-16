@@ -14,3 +14,30 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+body {
+  background: #22dd33;
+}
+
+.blackjack {
+   padding-left: 2em;
+}
+
+.blackjack .choice > div {
+  padding: 2em;
+  display: inline-block;
+
+}
+
+
+figure.card {
+  margin: 0.1em;
+  display: inline-block;
+  background-color: white;
+  width: 3em;
+  padding-top: 1em;
+  padding-left: 0.5em;
+  height: 4em;
+  border-radius: 3px;
+  box-shadow: 2px 2px 1px 1px gray;
+}

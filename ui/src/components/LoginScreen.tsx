@@ -21,12 +21,12 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
 
   const login = useCallback(async (credentials: Credentials) => {
     try {
-      const ledger = new Ledger({token: credentials.token, httpBaseUrl});
-      let userContract = await ledger.fetchByKey(User.User, credentials.party);
-      if (userContract === null) {
-        const user = {username: credentials.party, following: []};
-        userContract = await ledger.create(User.User, user);
-      }
+      // const ledger = new Ledger({token: credentials.token, httpBaseUrl});
+      // let userContract = await ledger.fetchByKey(User.User, credentials.party);
+      // if (userContract === null) {
+      //   const user = {username: credentials.party, following: []};
+      //   userContract = await ledger.create(User.User, user);
+      // }
       onLogin(credentials);
     } catch(error) {
       alert(`Unknown error:\n${error}`);
