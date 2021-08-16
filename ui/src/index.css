@@ -41,3 +41,7 @@ figure.card {
   border-radius: 3px;
   box-shadow: 2px 2px 1px 1px gray;
 }
+
+.blackjack button {
+  margin-left: 1em;
+}

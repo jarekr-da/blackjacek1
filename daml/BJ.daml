@@ -98,14 +98,14 @@ template DealerDeck with
         signatory dealer
         
 
-template PlayerAtTable with
+template PlayerWantsToJoin with
         player: Party
         dealer: Party
     where 
         signatory player
         observer dealer
         controller dealer can 
-            AcceptGame: ContractId GameProposal
+            AcceptGame: ContractId PlayerDecision
                 do
                     initialDeck <- fetchByKey @InitialDeck dealer
                     let initialPlayerCards = (takeCard ((snd initialDeck).deck) 0)  :: (takeCard ((snd initialDeck).deck) 1) ::[]
@@ -113,7 +113,7 @@ template PlayerAtTable with
                     dealerDeck <- exercise (fst initialDeck) ConsumeDeck
 
                     -- archive (fst dealerDeck) (can archived be read later?)
-                    create GameProposal with 
+                    create PlayerDecision with 
                         dealer = dealer
                         player = player
                         deck = dealerDeck
@@ -122,7 +122,7 @@ template PlayerAtTable with
                         playerCardValues = deckValues (Deck initialPlayerCards)
 
             
-template GameProposal with
+template PlayerDecision with
         deck: ContractId DealerDeck
         dealer: Party
         player: Party
@@ -211,14 +211,14 @@ template PlayerAsksForCard with
         playerCards: Deck
     where 
         signatory player, dealer
-        choice NextDeal: ContractId GameProposal
+        choice NextDeal: ContractId PlayerDecision
             controller dealer 
             do 
                 dealerShoe <- fetch deck
                 let cardsOnTable = (countDeck dealerCards) + (countDeck playerCards)
                 let newCard = takeCard  dealerShoe.deck cardsOnTable      
                 let newPlayerDeck =  addCard playerCards newCard
-                newProposal <- create GameProposal with 
+                newProposal <- create PlayerDecision with 
                     deck =  deck
                     playerCards = newPlayerDeck
                     dealerCards = dealerCards
@@ -237,7 +237,7 @@ test1 = do
     shoe <- submit d1 $ createCmd InitialDeck with dealer = d1 ; deck = exampleDeck
     dealerDeckOption <-  queryContractKey @InitialDeck d1 d1
 
-    table <- submit p1 $ createCmd PlayerAtTable with dealer = d1 ; player = p1
+    table <- submit p1 $ createCmd PlayerWantsToJoin with dealer = d1 ; player = p1
     proposal <- submit d1 $ exerciseCmd table AcceptGame
     hit <- submit p1 $ exerciseCmd proposal Hit
     deal <- submit d1 $ exerciseCmd hit NextDeal

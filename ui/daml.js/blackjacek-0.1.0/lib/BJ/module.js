@@ -27,7 +27,7 @@ exports.NextDeal = {
 
 
 exports.PlayerAsksForCard = {
-  templateId: 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:PlayerAsksForCard',
+  templateId: 'd3d2fd78a9c1b7333b5234ac9c299eeee6910ff9b65e4dd30309bb1a73cd3ac6:BJ:PlayerAsksForCard',
   keyDecoder: damlTypes.lazyMemo(function () { return jtv.constant(undefined); }),
   keyEncode: function () { throw 'EncodeError'; },
   decoder: damlTypes.lazyMemo(function () { return jtv.object({deck: damlTypes.ContractId(exports.DealerDeck).decoder, dealer: damlTypes.Party.decoder, player: damlTypes.Party.decoder, dealerCards: exports.Deck.decoder, playerCards: exports.Deck.decoder, }); }),
@@ -54,8 +54,8 @@ exports.PlayerAsksForCard = {
     choiceName: 'NextDeal',
     argumentDecoder: damlTypes.lazyMemo(function () { return exports.NextDeal.decoder; }),
     argumentEncode: function (__typed__) { return exports.NextDeal.encode(__typed__); },
-    resultDecoder: damlTypes.lazyMemo(function () { return damlTypes.ContractId(exports.GameProposal).decoder; }),
-    resultEncode: function (__typed__) { return damlTypes.ContractId(exports.GameProposal).encode(__typed__); },
+    resultDecoder: damlTypes.lazyMemo(function () { return damlTypes.ContractId(exports.PlayerDecision).decoder; }),
+    resultEncode: function (__typed__) { return damlTypes.ContractId(exports.PlayerDecision).encode(__typed__); },
   },
 };
 
@@ -65,7 +65,7 @@ damlTypes.registerTemplate(exports.PlayerAsksForCard);
 
 
 exports.GameEnd = {
-  templateId: 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:GameEnd',
+  templateId: 'd3d2fd78a9c1b7333b5234ac9c299eeee6910ff9b65e4dd30309bb1a73cd3ac6:BJ:GameEnd',
   keyDecoder: damlTypes.lazyMemo(function () { return jtv.constant(undefined); }),
   keyEncode: function () { throw 'EncodeError'; },
   decoder: damlTypes.lazyMemo(function () { return jtv.object({deck: damlTypes.ContractId(exports.DealerDeck).decoder, dealer: damlTypes.Party.decoder, player: damlTypes.Party.decoder, dealerCards: exports.Deck.decoder, playerCards: exports.Deck.decoder, shoeOriginal: exports.Deck.decoder, result: damlTypes.Int.decoder, }); }),
@@ -108,7 +108,7 @@ exports.DealSelf = {
 
 
 exports.PlayerStands = {
-  templateId: 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:PlayerStands',
+  templateId: 'd3d2fd78a9c1b7333b5234ac9c299eeee6910ff9b65e4dd30309bb1a73cd3ac6:BJ:PlayerStands',
   keyDecoder: damlTypes.lazyMemo(function () { return jtv.constant(undefined); }),
   keyEncode: function () { throw 'EncodeError'; },
   decoder: damlTypes.lazyMemo(function () { return jtv.object({deck: damlTypes.ContractId(exports.DealerDeck).decoder, dealer: damlTypes.Party.decoder, player: damlTypes.Party.decoder, dealerCards: exports.Deck.decoder, playerCards: exports.Deck.decoder, }); }),
@@ -167,8 +167,8 @@ exports.Hit = {
 
 
 
-exports.GameProposal = {
-  templateId: 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:GameProposal',
+exports.PlayerDecision = {
+  templateId: 'd3d2fd78a9c1b7333b5234ac9c299eeee6910ff9b65e4dd30309bb1a73cd3ac6:BJ:PlayerDecision',
   keyDecoder: damlTypes.lazyMemo(function () { return jtv.constant(undefined); }),
   keyEncode: function () { throw 'EncodeError'; },
   decoder: damlTypes.lazyMemo(function () { return jtv.object({deck: damlTypes.ContractId(exports.DealerDeck).decoder, dealer: damlTypes.Party.decoder, player: damlTypes.Party.decoder, dealerCards: exports.Deck.decoder, playerCards: exports.Deck.decoder, playerCardValues: damlTypes.List(damlTypes.Int).decoder, }); }),
@@ -184,7 +184,7 @@ exports.GameProposal = {
 }
 ,
   Archive: {
-    template: function () { return exports.GameProposal; },
+    template: function () { return exports.PlayerDecision; },
     choiceName: 'Archive',
     argumentDecoder: damlTypes.lazyMemo(function () { return pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive.decoder; }),
     argumentEncode: function (__typed__) { return pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive.encode(__typed__); },
@@ -192,7 +192,7 @@ exports.GameProposal = {
     resultEncode: function (__typed__) { return damlTypes.Unit.encode(__typed__); },
   },
   Hit: {
-    template: function () { return exports.GameProposal; },
+    template: function () { return exports.PlayerDecision; },
     choiceName: 'Hit',
     argumentDecoder: damlTypes.lazyMemo(function () { return exports.Hit.decoder; }),
     argumentEncode: function (__typed__) { return exports.Hit.encode(__typed__); },
@@ -200,7 +200,7 @@ exports.GameProposal = {
     resultEncode: function (__typed__) { return damlTypes.ContractId(exports.PlayerAsksForCard).encode(__typed__); },
   },
   Stand: {
-    template: function () { return exports.GameProposal; },
+    template: function () { return exports.PlayerDecision; },
     choiceName: 'Stand',
     argumentDecoder: damlTypes.lazyMemo(function () { return exports.Stand.decoder; }),
     argumentEncode: function (__typed__) { return exports.Stand.encode(__typed__); },
@@ -210,7 +210,7 @@ exports.GameProposal = {
 };
 
 
-damlTypes.registerTemplate(exports.GameProposal);
+damlTypes.registerTemplate(exports.PlayerDecision);
 
 
 
@@ -225,8 +225,8 @@ exports.AcceptGame = {
 
 
 
-exports.PlayerAtTable = {
-  templateId: 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:PlayerAtTable',
+exports.PlayerWantsToJoin = {
+  templateId: 'd3d2fd78a9c1b7333b5234ac9c299eeee6910ff9b65e4dd30309bb1a73cd3ac6:BJ:PlayerWantsToJoin',
   keyDecoder: damlTypes.lazyMemo(function () { return jtv.constant(undefined); }),
   keyEncode: function () { throw 'EncodeError'; },
   decoder: damlTypes.lazyMemo(function () { return jtv.object({player: damlTypes.Party.decoder, dealer: damlTypes.Party.decoder, }); }),
@@ -238,7 +238,7 @@ exports.PlayerAtTable = {
 }
 ,
   Archive: {
-    template: function () { return exports.PlayerAtTable; },
+    template: function () { return exports.PlayerWantsToJoin; },
     choiceName: 'Archive',
     argumentDecoder: damlTypes.lazyMemo(function () { return pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive.decoder; }),
     argumentEncode: function (__typed__) { return pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive.encode(__typed__); },
@@ -246,22 +246,22 @@ exports.PlayerAtTable = {
     resultEncode: function (__typed__) { return damlTypes.Unit.encode(__typed__); },
   },
   AcceptGame: {
-    template: function () { return exports.PlayerAtTable; },
+    template: function () { return exports.PlayerWantsToJoin; },
     choiceName: 'AcceptGame',
     argumentDecoder: damlTypes.lazyMemo(function () { return exports.AcceptGame.decoder; }),
     argumentEncode: function (__typed__) { return exports.AcceptGame.encode(__typed__); },
-    resultDecoder: damlTypes.lazyMemo(function () { return damlTypes.ContractId(exports.GameProposal).decoder; }),
-    resultEncode: function (__typed__) { return damlTypes.ContractId(exports.GameProposal).encode(__typed__); },
+    resultDecoder: damlTypes.lazyMemo(function () { return damlTypes.ContractId(exports.PlayerDecision).decoder; }),
+    resultEncode: function (__typed__) { return damlTypes.ContractId(exports.PlayerDecision).encode(__typed__); },
   },
 };
 
 
-damlTypes.registerTemplate(exports.PlayerAtTable);
+damlTypes.registerTemplate(exports.PlayerWantsToJoin);
 
 
 
 exports.DealerDeck = {
-  templateId: 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:DealerDeck',
+  templateId: 'd3d2fd78a9c1b7333b5234ac9c299eeee6910ff9b65e4dd30309bb1a73cd3ac6:BJ:DealerDeck',
   keyDecoder: damlTypes.lazyMemo(function () { return jtv.constant(undefined); }),
   keyEncode: function () { throw 'EncodeError'; },
   decoder: damlTypes.lazyMemo(function () { return jtv.object({dealer: damlTypes.Party.decoder, deck: exports.Deck.decoder, }); }),
@@ -299,7 +299,7 @@ exports.ConsumeDeck = {
 
 
 exports.InitialDeck = {
-  templateId: 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:InitialDeck',
+  templateId: 'd3d2fd78a9c1b7333b5234ac9c299eeee6910ff9b65e4dd30309bb1a73cd3ac6:BJ:InitialDeck',
   keyDecoder: damlTypes.lazyMemo(function () { return damlTypes.lazyMemo(function () { return damlTypes.Party.decoder; }); }),
   keyEncode: function (__typed__) { return damlTypes.Party.encode(__typed__); },
   decoder: damlTypes.lazyMemo(function () { return jtv.object({dealer: damlTypes.Party.decoder, deck: exports.Deck.decoder, }); }),

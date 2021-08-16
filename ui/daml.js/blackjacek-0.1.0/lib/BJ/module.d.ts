@@ -27,9 +27,9 @@ export declare type PlayerAsksForCard = {
 };
 
 export declare const PlayerAsksForCard:
-  damlTypes.Template<PlayerAsksForCard, undefined, 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:PlayerAsksForCard'> & {
+  damlTypes.Template<PlayerAsksForCard, undefined, 'd3d2fd78a9c1b7333b5234ac9c299eeee6910ff9b65e4dd30309bb1a73cd3ac6:BJ:PlayerAsksForCard'> & {
   Archive: damlTypes.Choice<PlayerAsksForCard, pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive, {}, undefined>;
-  NextDeal: damlTypes.Choice<PlayerAsksForCard, NextDeal, damlTypes.ContractId<GameProposal>, undefined>;
+  NextDeal: damlTypes.Choice<PlayerAsksForCard, NextDeal, damlTypes.ContractId<PlayerDecision>, undefined>;
 };
 
 export declare namespace PlayerAsksForCard {
@@ -52,7 +52,7 @@ export declare type GameEnd = {
 };
 
 export declare const GameEnd:
-  damlTypes.Template<GameEnd, undefined, 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:GameEnd'> & {
+  damlTypes.Template<GameEnd, undefined, 'd3d2fd78a9c1b7333b5234ac9c299eeee6910ff9b65e4dd30309bb1a73cd3ac6:BJ:GameEnd'> & {
   Archive: damlTypes.Choice<GameEnd, pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive, {}, undefined>;
 };
 
@@ -83,7 +83,7 @@ export declare type PlayerStands = {
 };
 
 export declare const PlayerStands:
-  damlTypes.Template<PlayerStands, undefined, 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:PlayerStands'> & {
+  damlTypes.Template<PlayerStands, undefined, 'd3d2fd78a9c1b7333b5234ac9c299eeee6910ff9b65e4dd30309bb1a73cd3ac6:BJ:PlayerStands'> & {
   DealSelf: damlTypes.Choice<PlayerStands, DealSelf, damlTypes.ContractId<GameEnd>, undefined>;
   Archive: damlTypes.Choice<PlayerStands, pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive, {}, undefined>;
 };
@@ -115,7 +115,7 @@ export declare const Hit:
 ;
 
 
-export declare type GameProposal = {
+export declare type PlayerDecision = {
   deck: damlTypes.ContractId<DealerDeck>;
   dealer: damlTypes.Party;
   player: damlTypes.Party;
@@ -124,18 +124,18 @@ export declare type GameProposal = {
   playerCardValues: damlTypes.Int[];
 };
 
-export declare const GameProposal:
-  damlTypes.Template<GameProposal, undefined, 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:GameProposal'> & {
-  Archive: damlTypes.Choice<GameProposal, pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive, {}, undefined>;
-  Hit: damlTypes.Choice<GameProposal, Hit, damlTypes.ContractId<PlayerAsksForCard>, undefined>;
-  Stand: damlTypes.Choice<GameProposal, Stand, damlTypes.ContractId<PlayerStands>, undefined>;
+export declare const PlayerDecision:
+  damlTypes.Template<PlayerDecision, undefined, 'd3d2fd78a9c1b7333b5234ac9c299eeee6910ff9b65e4dd30309bb1a73cd3ac6:BJ:PlayerDecision'> & {
+  Archive: damlTypes.Choice<PlayerDecision, pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive, {}, undefined>;
+  Hit: damlTypes.Choice<PlayerDecision, Hit, damlTypes.ContractId<PlayerAsksForCard>, undefined>;
+  Stand: damlTypes.Choice<PlayerDecision, Stand, damlTypes.ContractId<PlayerStands>, undefined>;
 };
 
-export declare namespace GameProposal {
-  export type CreateEvent = damlLedger.CreateEvent<GameProposal, undefined, typeof GameProposal.templateId>
-  export type ArchiveEvent = damlLedger.ArchiveEvent<GameProposal, typeof GameProposal.templateId>
-  export type Event = damlLedger.Event<GameProposal, undefined, typeof GameProposal.templateId>
-  export type QueryResult = damlLedger.QueryResult<GameProposal, undefined, typeof GameProposal.templateId>
+export declare namespace PlayerDecision {
+  export type CreateEvent = damlLedger.CreateEvent<PlayerDecision, undefined, typeof PlayerDecision.templateId>
+  export type ArchiveEvent = damlLedger.ArchiveEvent<PlayerDecision, typeof PlayerDecision.templateId>
+  export type Event = damlLedger.Event<PlayerDecision, undefined, typeof PlayerDecision.templateId>
+  export type QueryResult = damlLedger.QueryResult<PlayerDecision, undefined, typeof PlayerDecision.templateId>
 }
 
 
@@ -149,22 +149,22 @@ export declare const AcceptGame:
 ;
 
 
-export declare type PlayerAtTable = {
+export declare type PlayerWantsToJoin = {
   player: damlTypes.Party;
   dealer: damlTypes.Party;
 };
 
-export declare const PlayerAtTable:
-  damlTypes.Template<PlayerAtTable, undefined, 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:PlayerAtTable'> & {
-  Archive: damlTypes.Choice<PlayerAtTable, pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive, {}, undefined>;
-  AcceptGame: damlTypes.Choice<PlayerAtTable, AcceptGame, damlTypes.ContractId<GameProposal>, undefined>;
+export declare const PlayerWantsToJoin:
+  damlTypes.Template<PlayerWantsToJoin, undefined, 'd3d2fd78a9c1b7333b5234ac9c299eeee6910ff9b65e4dd30309bb1a73cd3ac6:BJ:PlayerWantsToJoin'> & {
+  Archive: damlTypes.Choice<PlayerWantsToJoin, pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive, {}, undefined>;
+  AcceptGame: damlTypes.Choice<PlayerWantsToJoin, AcceptGame, damlTypes.ContractId<PlayerDecision>, undefined>;
 };
 
-export declare namespace PlayerAtTable {
-  export type CreateEvent = damlLedger.CreateEvent<PlayerAtTable, undefined, typeof PlayerAtTable.templateId>
-  export type ArchiveEvent = damlLedger.ArchiveEvent<PlayerAtTable, typeof PlayerAtTable.templateId>
-  export type Event = damlLedger.Event<PlayerAtTable, undefined, typeof PlayerAtTable.templateId>
-  export type QueryResult = damlLedger.QueryResult<PlayerAtTable, undefined, typeof PlayerAtTable.templateId>
+export declare namespace PlayerWantsToJoin {
+  export type CreateEvent = damlLedger.CreateEvent<PlayerWantsToJoin, undefined, typeof PlayerWantsToJoin.templateId>
+  export type ArchiveEvent = damlLedger.ArchiveEvent<PlayerWantsToJoin, typeof PlayerWantsToJoin.templateId>
+  export type Event = damlLedger.Event<PlayerWantsToJoin, undefined, typeof PlayerWantsToJoin.templateId>
+  export type QueryResult = damlLedger.QueryResult<PlayerWantsToJoin, undefined, typeof PlayerWantsToJoin.templateId>
 }
 
 
@@ -175,7 +175,7 @@ export declare type DealerDeck = {
 };
 
 export declare const DealerDeck:
-  damlTypes.Template<DealerDeck, undefined, 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:DealerDeck'> & {
+  damlTypes.Template<DealerDeck, undefined, 'd3d2fd78a9c1b7333b5234ac9c299eeee6910ff9b65e4dd30309bb1a73cd3ac6:BJ:DealerDeck'> & {
   Archive: damlTypes.Choice<DealerDeck, pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive, {}, undefined>;
 };
 
@@ -203,7 +203,7 @@ export declare type InitialDeck = {
 };
 
 export declare const InitialDeck:
-  damlTypes.Template<InitialDeck, InitialDeck.Key, 'a965ccb80a2293487cf88ea130b94a5429f9f7249977fd1bca2587ae7dbfd99d:BJ:InitialDeck'> & {
+  damlTypes.Template<InitialDeck, InitialDeck.Key, 'd3d2fd78a9c1b7333b5234ac9c299eeee6910ff9b65e4dd30309bb1a73cd3ac6:BJ:InitialDeck'> & {
   Archive: damlTypes.Choice<InitialDeck, pkgd14e08374fc7197d6a0de468c968ae8ba3aadbf9315476fd39071831f5923662.DA.Internal.Template.Archive, {}, InitialDeck.Key>;
   ConsumeDeck: damlTypes.Choice<InitialDeck, ConsumeDeck, damlTypes.ContractId<DealerDeck>, InitialDeck.Key>;
 };
