@@ -72,6 +72,7 @@ const BJMain: React.FC = () => {
 
     return <div className={"blackjack"}>
         <h2>BlackJack</h2>
+        <h3>very simplified - dealer stands on all 17 </h3>
         {!isPlaying ?
             <div className={"choice"}>
                 <div>
@@ -82,34 +83,17 @@ const BJMain: React.FC = () => {
 
                 </div>
                 <div>
-                    <h3>play with dealer</h3>
+                    <h3>play against dealer</h3>
                     <input type={"text"} value={dealerName} onChange={e => setDealerName(e.currentTarget.value)}/>
                     <button onClick={findGame}>join table</button>
                 </div>
             </div> : <span></span>
         }
+        {
+            dealer ?  <button onClick={initDealerDeck}>shuffle new deck</button> : <span></span>
+        }
         <div>
-            <h3>my decisions</h3>
-            <ul> {
-                allDealerDecks.map(d => <li key={d.contractId}>name: {d.payload.dealer} cards:{d.payload.deck.value.length}</li>)
-            }
-            </ul>
-        </div>
-
-        <div>
-            <h3>players to accept</h3>
-            <ul> {
-                    allPlayersToAccept.map(d =>
-                        <li key={d.contractId}>dealer: {d.payload.dealer} player: {d.payload.player}
-                            {((d.payload.dealer === party) ?
-                                <button onClick={acceptGame(d.contractId)}>Accept</button> : <span></span>)
-                            }
-                        </li>)
-            }
-            </ul>
-        </div>
-        <div>
-            <h3>tables</h3>
+            <h3>games</h3>
             <ul>
                 {
                     allTables.map( table => <BJTable
@@ -143,12 +127,33 @@ const BJMain: React.FC = () => {
             </ul>
         </div>
         <div>
+            <h3>my tables</h3>
+            <ul> {
+                allDealerDecks.map(d => <li key={d.contractId}>name: {d.payload.dealer} cards:{d.payload.deck.value.length}</li>)
+            }
+            </ul>
+        </div>
+
+        <div>
+            <h3>players to accept</h3>
+            <ul> {
+                    allPlayersToAccept.map(d =>
+                        <li key={d.contractId}>dealer: {d.payload.dealer} player: {d.payload.player}
+                            {((d.payload.dealer === party) ?
+                                <button onClick={acceptGame(d.contractId)}>Accept</button> : <span></span>)
+                            }
+                        </li>)
+            }
+            </ul>
+        </div>
+
+        <div>
             <h3>finished</h3>
             <button onClick={_=>setDetails(!details)}>show details</button>
             <ul>
             {
                 finished.map ( game =>
-                    !details ?
+                    details ?
                         <BJTableFinished key={game.contractId} game={game.payload} contractId={game.contractId}/>
                         : <li>{game.payload.dealer} {game.payload.result}</li>
                 )
